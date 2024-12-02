@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tareas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #list-container {
+            background-color: white;
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+        #list-container:hover {
+            transform: translateY(-5px);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        #text-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s ease;
+        }
+        #text-input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        #add-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        #add-btn:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+        #add-btn:active {
+            transform: translateY(1px);
+        }
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .list-item:hover {
+            background-color: #f1f1f1;
+            transform: translateX(5px);
+        }
+        .list-item span {
+            font-size: 16px;
+            color: #333;
+        }
+        .delete-btn {
+            background-color: #ff5c5c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .delete-btn:hover {
+            background-color: #e04e4e;
+        }
+        .delete-btn:active {
+            background-color: #c94444;
+        }
+    </style>
+</head>
+<body>
+    <div id="list-container">
+        <h1>Lista de Tareas</h1>
+        <input type="text" id="text-input" placeholder="Ingresa una tarea" aria-label="Texto a agregar">
+        <button id="add-btn" aria-label="Agregar tarea">Agregar</button>
+        <div id="list"></div>
+    </div>
+
+    <script>
+        let items = JSON.parse(localStorage.getItem('textList')) || [];
+
+        // Función para agregar ítem
+        function addItem() {
+            const input = document.getElementById('text-input');
+            const text = input.value.trim();
+            
+            if (text !== '') {
+                const newItem = { id: Date.now(), text };
+                items.push(newItem);
+                updateLocalStorage();
+                renderList();
+                input.value = '';
+                input.focus();
+            } else {
+                alert('Por favor, ingresa un texto válido.');
+            }
+        }
+
+        // Función para eliminar ítem
+        function deleteItem(id) {
+            items = items.filter(item => item.id !== id);
+            updateLocalStorage();
+            renderList();
+        }
+
+        // Renderizar la lista
+        function renderList() {
+            const listContainer = document.getElementById('list');
+            listContainer.innerHTML = '';
+
+            items.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.classList.add('list-item');
+                itemElement.innerHTML = `
+                    <span>${item.text}</span>
+                    <button class="delete-btn" aria-label="Eliminar tarea" onclick="deleteItem(${item.id})">Eliminar</button>
+                `;
+                listContainer.appendChild(itemElement);
+            });
+        }
+
+        // Actualizar LocalStorage
+        function updateLocalStorage() {
+            localStorage.setItem('textList', JSON.stringify(items));
+        }
+
+        // Inicializar lista y configurar eventos
+        document.getElementById('add-btn').addEventListener('click', addItem);
+        document.getElementById('text-input').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                addItem();
+            }
+        });
+
+        // Renderizar la lista al cargar la página
+        renderList();
+    </script>
+</body>
+</html>
